@@ -1,0 +1,10 @@
+.omc
+.vscode
+## Ignore pycache files
+__pycache__/
+
+## Ignore .eggs files
+*.egg-info/
+hw1/submit/run_logs/*
+## Generated submission archive
+hw1/submit.zip
