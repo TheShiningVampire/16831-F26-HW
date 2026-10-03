@@ -157,7 +157,7 @@ python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
 
 \subsubsection{smallest \textbf{b*} and largest \textbf{r*} (same run) -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.2,height=4cm,width=\linewidth]
-$b^* = 300$, $r^* = 0.01$ (seed 5). This run first reaches 1000 at iteration 57, scores 1000 in 29 of the 100 iterations, and stays near 1000 from iteration 85 on (last-10 average 940, final 1000). Larger learning rates do not reach the optimum at $b=300$: 0.02 never scored 1000, and 0.05 only touched 1000 at isolated iterations without settling there (its 10-iteration moving average never exceeded 500; last-10 average 705). Smaller batches also fail: at $b=100$ and $b=200$ no learning rate held 1000 for more than a few iterations (last-10 averages $\le 341$).
+$b^* = 300$, $r^* = 0.01$ (seed 5). I count a run as reaching the optimum if it gets to 1000 and then stays near it, not if it only touches 1000. This run first reaches 1000 at iteration 57, scores 1000 in 29 of the 100 iterations, and stays near 1000 from iteration 85 on (last-10 average 940, final 1000). Other settings touch 1000 but do not hold it: at $b=300$, $r=0.05$ scores 1000 in 15 iterations but drops to near 0 in between (last-10 average 705) and $r=0.02$ never scores 1000; at $b=100$ and $b=200$ the best runs score 1000 in only 2--6 iterations and end far below it (last-10 averages $\le 341$).
 \end{answer}
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}

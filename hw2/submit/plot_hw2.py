@@ -8,8 +8,8 @@ Logs are read from run_logs/ next to this file (or data/ if there is no
 run_logs/). Figures are written to figures/. Each curve shows the raw
 Eval_AverageReturn faintly and a 10-iteration moving average in bold.
 """
-import glob
 import os
+import re
 import sys
 
 import matplotlib
@@ -28,11 +28,19 @@ COLORS = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 
 def load(exp_name):
-    """Return Eval_AverageReturn for the run whose folder starts with exp_name."""
-    matches = sorted(glob.glob(os.path.join(DATA, exp_name + '_*')))
+    """Return Eval_AverageReturn for the run named exp_name.
+
+    The logger names a run folder <exp_name>_<EnvName-vN>_<date>_<time>, so
+    match the whole exp_name followed by the environment and time stamp, not
+    just the prefix (q4_b50000_r0.02 must not pick up q4_b50000_r0.02_rtg).
+    """
+    pattern = re.compile(re.escape(exp_name) + r'_[A-Za-z]+-v\d+_\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2}$')
+    matches = sorted(d for d in os.listdir(DATA) if pattern.match(d))
     if not matches:
         raise FileNotFoundError('no run folder for ' + exp_name)
-    ea = EventAccumulator(matches[-1])
+    if len(matches) > 1:
+        print('note: %d runs for %s, using the latest' % (len(matches), exp_name))
+    ea = EventAccumulator(os.path.join(DATA, matches[-1]))
     ea.Reload()
     return np.array([e.value for e in ea.Scalars('Eval_AverageReturn')])
 
