@@ -84,6 +84,7 @@ backgroundcolor = \color{light-yellow}
 \begin{minted}
 [framesep=2mm, fontsize=\scriptsize, breaklines]
 {bash}
+# All runs in this report were done on CPU: --no_gpu was added to every command.
 python rob831/scripts/run_hw2.py --env_name CartPole-v0 -n 150 -b 1500 \
     -dsa --exp_name q1_sb_no_rtg_dsa
 
@@ -127,7 +128,7 @@ Reward-to-go is clearly better. Comparing the two runs without standardization, 
 
 \subsubsubsection{Advantage standardization -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.2,height=4cm,width=\linewidth]
-Yes, for stability rather than speed. The two reward-to-go runs reached 200 at essentially the same iteration with and without standardization. The difference came afterwards: without it, the small-batch run collapsed to a return of 34 after having solved the task, whereas with it the return never fell below about 100, and the large batch showed the same pattern. Standardizing keeps the size of each update roughly constant regardless of how large the raw returns are in that batch, so one batch of unusually long or short episodes cannot produce an oversized step that undoes earlier progress.
+Yes, for stability rather than speed. The two reward-to-go runs reached 200 at essentially the same iteration with and without standardization. The difference came afterwards: without it, the small-batch run collapsed to a return of 34 after having solved the task, whereas with it the return never fell below about 100, and the large batch showed the same pattern. Standardizing makes the advantages independent of the overall scale of the returns, which in CartPole grows as episodes get longer, so the effective step size no longer grows with performance; this does not bound the update, but it removes one source of large steps and makes training more stable.
 \end{answer}
 
 \subsubsubsection{Batch size -- \lbrack1 points\rbrack}
