@@ -142,10 +142,10 @@ Yes, for the reward-to-go runs. With $b=6000$ they first reached 200 earlier (it
 \begin{minted}
 [framesep=2mm, fontsize=\scriptsize, breaklines]
 {bash}
-# Best run (b* = 300, r* = 0.05):
+# Best run (b* = 300, r* = 0.01):
 python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
-    --ep_len 1000 --discount 0.92 -n 100 -l 2 -s 64 -b 300 -lr 0.05 -rtg \
-    --seed 5 --exp_name q2_b300_r0.05
+    --ep_len 1000 --discount 0.92 -n 100 -l 2 -s 64 -b 300 -lr 0.01 -rtg \
+    --seed 5 --exp_name q2_b300_r0.01
 
 # Search: the same command for every pair of
 #   <b> in {100, 200, 300, 500, 1000, 2000, 5000} and <r> in {0.005, 0.01, 0.02, 0.05}
@@ -157,13 +157,13 @@ python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
 
 \subsubsection{smallest \textbf{b*} and largest \textbf{r*} (same run) -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.2,height=4cm,width=\linewidth]
-$b^* = 300$, $r^* = 0.05$ (seed 5). This run first reaches 1000 at iteration 50, scores 1000 in 15 of the 100 iterations and ends at 1000; it is the largest learning rate in my grid that reaches 1000 at $b=300$ (0.02 never did). Smaller batches do not get there: at $b=100$ and $b=200$ no learning rate held 1000 for more than a few isolated iterations (last-10 averages $\le 341$). The run fluctuates a lot between visits to 1000; $r=0.01$ at the same batch size is steadier (last-10 average 940 vs.\ 705) if stability matters more than step size.
+$b^* = 300$, $r^* = 0.01$ (seed 5). This run first reaches 1000 at iteration 57, scores 1000 in 29 of the 100 iterations, and stays near 1000 from iteration 85 on (last-10 average 940, final 1000). Larger learning rates do not reach the optimum at $b=300$: 0.02 never scored 1000, and 0.05 only touched 1000 at isolated iterations without settling there (its 10-iteration moving average never exceeded 500; last-10 average 705). Smaller batches also fail: at $b=100$ and $b=200$ no learning rate held 1000 for more than a few iterations (last-10 averages $\le 341$).
 \end{answer}
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.3,height=10cm,width=\linewidth]
 \centering
-\includegraphics[height=8cm]{figures/q2_b300_r0_05.pdf}
+\includegraphics[height=8cm]{figures/q2_b300_r0_01.pdf}
 \end{answer}
 
 \setcounter{section}{6}
