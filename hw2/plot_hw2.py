@@ -1,11 +1,12 @@
-"""Make the report figures from the TensorBoard logs in data/.
+"""Make the report figures from the TensorBoard logs.
 
-Usage (from the hw2/ folder, rob831 env active):
+Usage (from the folder containing this file, rob831 env active):
     python plot_hw2.py                 # all figures
     python plot_hw2.py q2 q4_search    # only some
 
-Figures are written to figures/. Each curve shows the raw Eval_AverageReturn
-faintly and a 10-iteration moving average in bold.
+Logs are read from run_logs/ next to this file (or data/ if there is no
+run_logs/). Figures are written to figures/. Each curve shows the raw
+Eval_AverageReturn faintly and a 10-iteration moving average in bold.
 """
 import glob
 import os
@@ -17,8 +18,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
 
-DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'figures')
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(HERE, 'run_logs')
+if not os.path.isdir(DATA):
+    DATA = os.path.join(HERE, 'data')
+OUT = os.path.join(HERE, 'figures')
 WINDOW = 10
 COLORS = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
@@ -77,8 +81,8 @@ def q1():
 
 
 def q2():
-    plot('q2_b300_r0_05', 'InvertedPendulum-v4, b = 300, lr = 0.05',
-         [('', 'q2_b300_r0.05', COLORS[0], '-')], target=1000)
+    plot('q2_b300_r0_01', 'InvertedPendulum-v4, b = 300, lr = 0.01',
+         [('', 'q2_b300_r0.01', COLORS[0], '-')], target=1000)
 
 
 def q2_search():
