@@ -69,8 +69,8 @@ backgroundcolor = \color{light-yellow}
 \end{centering}
 \vspace{0.25cm}
 
-\textbf{Andrew ID:} \texttt{Write your Andrew ID here.} \\
-\textbf{Collaborators:} \texttt{Write the Andrew IDs of your collaborators here (if any).}\\ 
+\textbf{Andrew ID:} \texttt{vawale} \\
+\textbf{Collaborators:} \texttt{None}\\
 \textbf{NOTE:} Please do \textbf{NOT} change the sizes of the answer blocks or plots.
 
 \setcounter{section}{4}
@@ -108,59 +108,62 @@ python rob831/scripts/run_hw2.py --env_name CartPole-v0 -n 150 -b 6000 \
 
 \subsubsubsection{Small batch -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.2.1,height=9.5cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q1_small_batch.pdf}
 \end{answer}
 
 \subsubsubsection{Large batch -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q5.1.2.2,height=9.5cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q1_large_batch.pdf}
 \end{answer}
 
 \subsubsection{Analysis}
 
 \subsubsubsection{Value estimator -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.1,height=4cm,width=\linewidth]
-% TODO
+Reward-to-go. Without advantage standardization (the two \texttt{dsa} runs), reward-to-go first reached 200 sooner (iteration 16 vs.\ 27 at $b=1500$; 11 vs.\ 32 at $b=6000$) and averaged higher over the last 50 iterations (187 vs.\ 175; 195 vs.\ 169). The trajectory-centric estimator stayed unstable and ended below 200 at both batch sizes (153 and 123). Reward-to-go removes the rewards earned before each action, which cannot be affected by that action and only add variance to the gradient.
 \end{answer}
 
 \subsubsubsection{Advantage standardization -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.2,height=4cm,width=\linewidth]
-% TODO
+Yes, modestly. Comparing the two reward-to-go runs, standardization did not change how quickly 200 was first reached, but it made training steadier afterwards: the lowest return after first reaching 200 was 104 with standardization vs.\ 34 without at $b=1500$, and 139 vs.\ 99 at $b=6000$. The average over the last 50 iterations was also higher (195 vs.\ 187; 198 vs.\ 195). Standardizing keeps the scale of the gradient consistent from batch to batch.
 \end{answer}
 
 \subsubsubsection{Batch size -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.3,height=4cm,width=\linewidth]
-% TODO
+Yes, for the reward-to-go runs. With $b=6000$ they first reached 200 earlier (iterations 11--12 vs.\ 16) and dipped less afterwards (lowest later returns 99 and 139, vs.\ 34 and 104 at $b=1500$), since a larger batch gives a lower-variance gradient estimate. The trajectory-centric estimator did not benefit: it ended below 200 at both batch sizes, so batch size alone did not fix its variance.
 \end{answer}
 
 \subsection{Experiment 2 (InvertedPendulum) -- \lbrack3 points total\rbrack}
 
 \subsubsection{Configurations -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.1,height=10cm,width=\linewidth]
-% TODO
 \begin{minted}
 [framesep=2mm, fontsize=\scriptsize, breaklines]
 {bash}
+# Best run (b* = 300, r* = 0.05):
 python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
-    --ep_len 1000 --discount 0.92 -n 100 -l 2 -s 64 -b <b*> -lr <r*> -rtg \
-    --exp_name q2_b<b*>_r<r*>
+    --ep_len 1000 --discount 0.92 -n 100 -l 2 -s 64 -b 300 -lr 0.05 -rtg \
+    --seed 5 --exp_name q2_b300_r0.05
+
+# Search: the same command for every pair of
+#   <b> in {100, 200, 300, 500, 1000, 2000, 5000} and <r> in {0.005, 0.01, 0.02, 0.05}
+python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
+    --ep_len 1000 --discount 0.92 -n 100 -l 2 -s 64 -b <b> -lr <r> -rtg \
+    --seed 5 --exp_name q2_b<b>_r<r>
 \end{minted}
 \end{answer}
 
 \subsubsection{smallest \textbf{b*} and largest \textbf{r*} (same run) -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.2,height=4cm,width=\linewidth]
-% TODO
+$b^* = 300$, $r^* = 0.05$ (seed 5). This run first reaches 1000 at iteration 50, scores 1000 in 15 of the 100 iterations and ends at 1000; it is the largest learning rate in my grid that reaches 1000 at $b=300$ (0.02 never did). Smaller batches do not get there: at $b=100$ and $b=200$ no learning rate held 1000 for more than a few isolated iterations (last-10 averages $\le 341$). The run fluctuates a lot between visits to 1000; $r=0.01$ at the same batch size is steadier (last-10 average 940 vs.\ 705) if stability matters more than step size.
 \end{answer}
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.3,height=10cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q2_b300_r0_05.pdf}
 \end{answer}
 
 \setcounter{section}{6}
@@ -174,7 +177,7 @@ python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
 [framesep=2mm, fontsize=\scriptsize, breaklines]
 {bash}
 python rob831/scripts/run_hw2.py \
-    --env_name LunarLanderContinuous-v2 --ep_len 1000
+    --env_name LunarLanderContinuous-v2 --ep_len 1000 \
     --discount 0.99 -n 100 -l 2 -s 64 -b 10000 -lr 0.005 \
     --reward_to_go --nn_baseline --exp_name q3_b10000_r0.005
 \end{minted}
@@ -182,9 +185,8 @@ python rob831/scripts/run_hw2.py \
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q7.1.2,height=10cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q3_lunarlander.pdf}
 \end{answer}
 
 \subsection{Experiment 4 (HalfCheetah) -- \lbrack3.5 points\rbrack}
@@ -194,74 +196,78 @@ python rob831/scripts/run_hw2.py \
 \begin{minted}
 [framesep=2mm, fontsize=\scriptsize, breaklines, escapeinside=||, mathescape=true]
 {python}
+# Search (plotted in Q7.2.2): the same command for every pair of
+#   <b> in {10000, 30000, 50000} and <r> in {0.005, 0.01, 0.02}
+python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
+    --discount 0.95 -n 100 -l 2 -s 32 -b <b> -lr <r> -rtg --nn_baseline \
+    --seed 5 --exp_name q4_search_b<b>_lr<r>_rtg_nnbaseline
+
+# Extra comparison at the smallest batch (plotted in Q7.2.4): the four
+# estimator variants with b = 10000, lr = 0.02
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
     --discount 0.95 -n 100 -l 2 -s 32 -b 10000 -lr 0.02 \
-    --exp_name q4_search_b10000_lr0.02
+    --seed 5 --exp_name q4_b10000_r0.02
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
     --discount 0.95 -n 100 -l 2 -s 32 -b 10000 -lr 0.02 -rtg \
-    --exp_name q4_search_b10000_lr0.02_rtg
+    --seed 5 --exp_name q4_b10000_r0.02_rtg
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
     --discount 0.95 -n 100 -l 2 -s 32 -b 10000 -lr 0.02 --nn_baseline \
-    --exp_name q4_search_b10000_lr0.02_nnbaseline
+    --seed 5 --exp_name q4_b10000_r0.02_nnbaseline
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
     --discount 0.95 -n 100 -l 2 -s 32 -b 10000 -lr 0.02 -rtg --nn_baseline \
-    --exp_name q4_search_b10000_lr0.02_rtg_nnbaseline
+    --seed 5 --exp_name q4_b10000_r0.02_rtg_nnbaseline
 \end{minted}
 \end{answer}
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q7.2.2,height=10cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q4_search.pdf}
 \end{answer}
 
 \subsubsection{ Optimal b* and r* -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q7.2.3,height=4cm,width=\linewidth]
-% TODO
+$b^* = 50000$, $r^* = 0.02$ (seed 5). This setting had the highest return in the search: 344 at the final iteration, with an average of 310 over the last 10 iterations.
 \end{answer}
 
 \subsubsection{ Plot -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q7.2.4,height=10cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q4_final_b10000_r0_02.pdf}
 \end{answer}
 
 \subsubsection{ Describe how b* and r* affect task performance -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q7.2.5,height=4cm,width=\linewidth]
-% TODO
+The learning rate had the largest effect: at every batch size the final return rose with it (at $b=50000$: 46, 133 and 344 for 0.005, 0.01 and 0.02), so the largest value in the grid was best. Batch size mattered mainly at that learning rate: with 0.02 the final return was 104, 312 and 344 for $b=10000$, 30000 and 50000. Larger batches give lower-variance gradients, so the large step can be used without the drops seen at $b=10000$. A possible related effect: at $b=10000$ reward-to-go ends similarly with and without the baseline (Q7.2.4), while at $b=50000$ the baseline gives a clear gain (Q7.2.7); with a single seed I cannot rule out run-to-run noise as the reason.
 \end{answer}
 
 \subsubsection{Configurations with optimal b* and r* -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q7.2.6,height=6cm,width=\linewidth]
-% TODO
 \begin{minted}
 [framesep=2mm, fontsize=\scriptsize, breaklines]
 {bash}
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
-    --discount 0.95 -n 100 -l 2 -s 32 -b <b*> -lr <r*> \
-    --exp_name q4_b<b*>_r<r*>
+    --discount 0.95 -n 100 -l 2 -s 32 -b 50000 -lr 0.02 \
+    --seed 5 --exp_name q4_b50000_r0.02
 
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
-    --discount 0.95 -n 100 -l 2 -s 32 -b <b*> -lr <r*> -rtg \
-    --exp_name q4_b<b*>_r<r*>_rtg
+    --discount 0.95 -n 100 -l 2 -s 32 -b 50000 -lr 0.02 -rtg \
+    --seed 5 --exp_name q4_b50000_r0.02_rtg
 
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
-    --discount 0.95 -n 100 -l 2 -s 32 -b <b*> -lr <r*> --nn_baseline \
-    --exp_name q4_b<b*>_r<r*>_nnbaseline
+    --discount 0.95 -n 100 -l 2 -s 32 -b 50000 -lr 0.02 --nn_baseline \
+    --seed 5 --exp_name q4_b50000_r0.02_nnbaseline
 
 python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
-    --discount 0.95 -n 100 -l 2 -s 32 -b <b*> -lr <r*> -rtg --nn_baseline \
-    --exp_name q4_b<b*>_r<r*>_rtg_nnbaseline
+    --discount 0.95 -n 100 -l 2 -s 32 -b 50000 -lr 0.02 -rtg --nn_baseline \
+    --seed 5 --exp_name q4_b50000_r0.02_rtg_nnbaseline
 \end{minted}
 \end{answer}
 
 \subsubsection{Plot for four runs with optimal b* and r* -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q7.2.7,height=10cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q4_final_b50000_r0_02.pdf}
 \end{answer}
 
 \section{Implementing Generalized Advantage Estimation (3 Pts)}
@@ -275,7 +281,7 @@ python rob831/scripts/run_hw2.py --env_name HalfCheetah-v4 --ep_len 150 \
 {python}
 # $\lambda \in [0,0.95,0.99,1]$
 python rob831/scripts/run_hw2.py \
-    --env_name Hopper-v4 --ep_len 1000
+    --env_name Hopper-v4 --ep_len 1000 \
     --discount 0.99 -n 300 -l 2 -s 32 -b 2000 -lr 0.001 \
     --reward_to_go --nn_baseline --action_noise_std 0.5 --gae_lambda <|$\lambda$|> \
     --exp_name q5_b2000_r0.001_lambda<|$\lambda$|>
@@ -284,21 +290,20 @@ python rob831/scripts/run_hw2.py \
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q8.1.2,height=10cm,width=\linewidth]
-% TODO
 \centering
-\includegraphics[height=8cm]{example-image-a}
+\includegraphics[height=8cm]{figures/q5_hopper.pdf}
 \end{answer}
 
 \subsubsection{Describe how $\lambda$ affects task performance -- \lbrack1.5 points\rbrack}
 \begin{answer}[title=Q8.1.3,height=4cm,width=\linewidth]
-% TODO
+$\lambda=0$ was clearly worst: it never reached 400 and oscillated (last-50 average 136), because the advantage is then the one-step TD error and relies entirely on an imperfect value function (high bias). Larger $\lambda$ mixes in longer Monte Carlo returns, trading bias for variance: $\lambda=0.95$, 0.99 and 1 all passed 400 (first at iterations 165, 174 and 222), with last-50 averages of 427, 461 and 392. $\lambda=0.99$ was the best trade-off; $\lambda=1$ (the plain baseline estimator) learned more slowly but ended highest, at 564.
 \end{answer}
 
 \subsubsection{Find one robotics paper from the last 5 years that uses policy gradients or an actor-critic method as part of its methodology. 
     In a short paragraph (4--5 sentences): (i) cite the paper, (ii) briefly describe the robot task and how reinforcement learning is used, and (iii) identify one technique from this homework (e.g., reward-to-go, a value-function baseline, or GAE) that is related to the method used in the paper. A few sentences is enough; this is not meant to be an extensive literature review  -- \lbrack0.5 points\rbrack
 }
 \begin{answer}[title=Q8.1.4,height=4cm,width=\linewidth]
-% TODO
+E.~Kaufmann, L.~Bauersfeld, A.~Loquercio, M.~M\"uller, V.~Koltun and D.~Scaramuzza, ``Champion-level drone racing using deep reinforcement learning,'' \emph{Nature} 620, 982--987 (2023). Their system, Swift, races a quadrotor through a gate course against human world champions using only onboard sensing. The control policy maps the estimated drone state to thrust and body-rate commands and is trained in simulation with PPO, an on-policy actor-critic policy-gradient method. PPO's critic is a learned value function subtracted from the return to form the advantage, which is the value-function baseline used in this homework.
 \end{answer}
 
 \end{document}
