@@ -122,17 +122,17 @@ python rob831/scripts/run_hw2.py --env_name CartPole-v0 -n 150 -b 6000 \
 
 \subsubsubsection{Value estimator -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.1,height=4cm,width=\linewidth]
-Reward-to-go. Without advantage standardization (the two \texttt{dsa} runs), reward-to-go first reached 200 sooner (iteration 16 vs.\ 27 at $b=1500$; 11 vs.\ 32 at $b=6000$) and averaged higher over the last 50 iterations (187 vs.\ 175; 195 vs.\ 169). The trajectory-centric estimator stayed unstable and ended below 200 at both batch sizes (153 and 123). Reward-to-go removes the rewards earned before each action, which cannot be affected by that action and only add variance to the gradient.
+Reward-to-go is clearly better. Comparing the two runs without standardization, reward-to-go reached 200 about twice as fast (by iteration 16 instead of 27 with the small batch, and 11 instead of 32 with the large one) and then mostly stayed there, while the trajectory-centric estimator kept falling back and ended below 200 at both batch sizes. The reason is variance: the full-trajectory return credits every action with rewards that were earned before it was taken, which the action could not have influenced. Reward-to-go drops those terms, so each gradient estimate carries less noise and the policy improves more steadily.
 \end{answer}
 
 \subsubsubsection{Advantage standardization -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.2,height=4cm,width=\linewidth]
-Yes, modestly. Comparing the two reward-to-go runs, standardization did not change how quickly 200 was first reached, but it made training steadier afterwards: the lowest return after first reaching 200 was 104 with standardization vs.\ 34 without at $b=1500$, and 139 vs.\ 99 at $b=6000$. The average over the last 50 iterations was also higher (195 vs.\ 187; 198 vs.\ 195). Standardizing keeps the scale of the gradient consistent from batch to batch.
+Yes, for stability rather than speed. The two reward-to-go runs reached 200 at essentially the same iteration with and without standardization. The difference came afterwards: without it, the small-batch run collapsed to a return of 34 after having solved the task, whereas with it the return never fell below about 100, and the large batch showed the same pattern. Standardizing keeps the size of each update roughly constant regardless of how large the raw returns are in that batch, so one batch of unusually long or short episodes cannot produce an oversized step that undoes earlier progress.
 \end{answer}
 
 \subsubsubsection{Batch size -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.1.3.3,height=4cm,width=\linewidth]
-Yes, for the reward-to-go runs. With $b=6000$ they first reached 200 earlier (iterations 11--12 vs.\ 16) and dipped less afterwards (lowest later returns 99 and 139, vs.\ 34 and 104 at $b=1500$), since a larger batch gives a lower-variance gradient estimate. The trajectory-centric estimator did not benefit: it ended below 200 at both batch sizes, so batch size alone did not fix its variance.
+Yes. With the larger batch the reward-to-go runs reached 200 a few iterations sooner (around iteration 11 instead of 16) and, more noticeably, their dips after reaching 200 were much shallower. A batch of 6000 steps averages the gradient over roughly four times as many trajectories, so each update points more reliably in the right direction. The trajectory-centric estimator is the exception: even with the large batch it kept oscillating and finished below 200, so simply collecting more data did not compensate for the extra variance that estimator carries. Reward-to-go removes that variance at its source, which is why it benefits more from a larger batch.
 \end{answer}
 
 \subsection{Experiment 2 (InvertedPendulum) -- \lbrack3 points total\rbrack}
@@ -157,7 +157,7 @@ python rob831/scripts/run_hw2.py --env_name InvertedPendulum-v4 \
 
 \subsubsection{smallest \textbf{b*} and largest \textbf{r*} (same run) -- \lbrack1 points\rbrack}
 \begin{answer}[title=Q5.2.2,height=4cm,width=\linewidth]
-$b^* = 300$, $r^* = 0.01$ (seed 5). I count a run as reaching the optimum if it gets to 1000 and then stays near it, not if it only touches 1000. This run first reaches 1000 at iteration 57, scores 1000 in 29 of the 100 iterations, and stays near 1000 from iteration 85 on (last-10 average 940, final 1000). Other settings touch 1000 but do not hold it: at $b=300$, $r=0.05$ scores 1000 in 15 iterations but drops to near 0 in between (last-10 average 705) and $r=0.02$ never scores 1000; at $b=100$ and $b=200$ the best runs score 1000 in only 2--6 iterations and end far below it (last-10 averages $\le 341$).
+$b^* = 300$, $r^* = 0.01$ (seed 5). I chose this as the smallest batch and largest learning rate at which the policy not only reaches 1000 but stays there: it first hits 1000 at iteration 57 and holds near 1000 for the last 15 iterations. Pushing further did not work. At the same batch size, $r=0.02$ never reached 1000, and $r=0.05$ did hit 1000 several times but kept collapsing to near zero in between, since a step that large keeps overshooting. Batches of 100 and 200 were too noisy at every learning rate: each touched 1000 only a handful of times and ended far below it.
 \end{answer}
 
 \subsubsection{Plot -- \lbrack1 points\rbrack}
@@ -238,7 +238,7 @@ $b^* = 50000$, $r^* = 0.02$ (seed 5). This setting had the highest return in the
 
 \subsubsection{ Describe how b* and r* affect task performance -- \lbrack0.5 points\rbrack}
 \begin{answer}[title=Q7.2.5,height=4cm,width=\linewidth]
-The learning rate had the largest effect: at every batch size the final return rose with it (at $b=50000$: 46, 133 and 344 for 0.005, 0.01 and 0.02), so the largest value in the grid was best. Batch size mattered mainly at that learning rate: with 0.02 the final return was 104, 312 and 344 for $b=10000$, 30000 and 50000. Larger batches give lower-variance gradients, so the large step can be used without the drops seen at $b=10000$. A possible related effect: at $b=10000$ reward-to-go ends similarly with and without the baseline (Q7.2.4), while at $b=50000$ the baseline gives a clear gain (Q7.2.7); with a single seed I cannot rule out run-to-run noise as the reason.
+The learning rate mattered most: at every batch size the final return rose with it, and the largest value, 0.02, was best everywhere, since with only 100 iterations the smaller steps do not get far (at $b=50000$ the final return went from 46 to 344 between 0.005 and 0.02). Batch size mattered mainly once the step was large: at 0.02 the final return roughly tripled from $b=10000$ to 50000, because the large batch averages out gradient noise and lets the big step be taken without the drops the 10000-step runs show. A large step is only safe when the gradient is good enough to trust. The baseline also helped more at the large batch (Q7.2.7 vs.\ Q7.2.4), though with one seed I cannot rule out noise.
 \end{answer}
 
 \subsubsection{Configurations with optimal b* and r* -- \lbrack0.5 points\rbrack}
@@ -296,7 +296,7 @@ python rob831/scripts/run_hw2.py \
 
 \subsubsection{Describe how $\lambda$ affects task performance -- \lbrack1.5 points\rbrack}
 \begin{answer}[title=Q8.1.3,height=4cm,width=\linewidth]
-$\lambda=0$ was clearly worst: it never reached 400 and oscillated (last-50 average 136), because the advantage is then the one-step TD error and relies entirely on an imperfect value function (high bias). Larger $\lambda$ mixes in longer Monte Carlo returns, trading bias for variance: $\lambda=0.95$, 0.99 and 1 all passed 400 (first at iterations 165, 174 and 222), with last-50 averages of 427, 461 and 392. $\lambda=0.99$ was the best trade-off; $\lambda=1$ (the plain baseline estimator) learned more slowly but ended highest, at 564.
+$\lambda$ sets how much the advantage estimate trusts the learned value function versus observed rewards, and the results follow the expected bias--variance trade-off. With $\lambda=0$ the advantage is the one-step TD error, so it leans entirely on a still-inaccurate value function: this run never reached 400 and kept oscillating. Raising $\lambda$ mixes in longer stretches of real rewards, removing that bias at the cost of noisier estimates: $\lambda=0.95$, 0.99 and 1 all passed 400, with 0.99 best overall (about 460 over the last 50 iterations). $\lambda=1$, the plain Monte Carlo baseline estimator, was slowest to get going because of its higher variance, though it ended highest at 564.
 \end{answer}
 
 \subsubsection{Find one robotics paper from the last 5 years that uses policy gradients or an actor-critic method as part of its methodology. 
