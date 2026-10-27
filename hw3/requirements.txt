@@ -1,0 +1,16 @@
+# Same pinned versions as hw1/requirements.txt, so installing into the
+# existing `rob831` conda environment from homework 1 only adds Box2D.
+# Box2D==2.3.10 ships prebuilt wheels (Linux/macOS/Windows), so no swig/compiler is needed.
+numpy==1.25.2
+mujoco==2.2.1
+gym==0.25.1
+Box2D==2.3.10
+tensorboard==2.10.0
+tensorboardX==2.5.1
+matplotlib>=3.8,<3.10
+torch==1.12.1
+pyvirtualdisplay
+IPython
+gym-notebook-wrapper
+# tensorboardX 2.5.1 video logging needs moviepy.editor, which was removed in moviepy 2.x
+moviepy==1.0.3
