@@ -7,6 +7,10 @@ __pycache__/
 *.egg-info/
 hw1/submit/run_logs/*
 hw2/submit/run_logs/*
+hw3/submit/run_logs/*
+hw4/submit/run_logs/*
 ## Generated submission archive
 hw1/submit.zip
 hw2/submit.zip
+hw3/submit.zip
+hw4/submit.zip
